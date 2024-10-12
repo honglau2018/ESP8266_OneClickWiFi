@@ -23,125 +23,124 @@ bool isObstacleDetectionEnabled = false; // 障碍检测状态标识
 int lastLeftSensorValue = HIGH;          // 用于保存上次的传感器状态
 int lastRightSensorValue = HIGH;
 
-// generateHTML控制网页内容
-String generateHTML = R"(
+// generate_html 控制网页内容
+String generate_html = R"(
   <html>
-     <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- 禁止缩放 -->
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              text-align: center;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f4; 
-              user-select: none; 
-              -webkit-user-select: none; 
-              -moz-user-select: none; 
-              touch-action: manipulation; 
-            }
-            .button-container {
-              margin: 16px 16px;
-            }
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- 禁止缩放 -->
+      <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            touch-action: manipulation; 
+          }
+          .button-container {
+            margin: 16px 16px;
+          }
+          button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px; 
+            cursor: pointer;
+            width: 76%; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            transition: background-color 0.3s, transform 0.3s; 
+          }
+          button.active {
+            transform: scale(1.2); 
+          }
+          button:hover {
+            background-color: #45a049;
+          }
+          .slider-container {
+            margin: 16px 16px;
+          }
+          .slider-label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block;
+          }
+          .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 76%;
+            height: 30px;
+            background-color: #4CAF50;
+            border-radius: 8px;
+            outline: none;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+          .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+          }
+          .slider:active::-webkit-slider-thumb {
+            transform: scale(1.2);
+          }
+          .slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+          }
+          .slider:active::-moz-range-thumb {
+            transform: scale(1.2);
+          }
+          @media (min-width: 600px) { 
             button {
-              font-size: 20px;
-              padding: 10px 20px;
-              margin: 5px;
-              background-color: #4CAF50;
-              color: white;
-              border: none;
-              border-radius: 8px; 
-              cursor: pointer;
-              width: 76%; 
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-              transition: background-color 0.3s, transform 0.3s; 
-
+              width: auto; 
             }
-            button.active {
-               transform: scale(1.2); 
-            }
-            button:hover {
-              background-color: #45a049;
-            }
-            .slider-container {
-              margin: 16px 16px;
-            }
-            .slider-label {
-              font-size: 18px;
-              margin-bottom: 10px;
-              display: block;
-            }
-            .slider {
-              -webkit-appearance: none;
-              appearance: none;
-              width: 76%;
-              height: 30px;
-              background-color: #4CAF50;
-              border-radius: 8px;
-              outline: none;
-              transition: background-color 0.3s;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            .slider::-webkit-slider-thumb {
-              -webkit-appearance: none;
-              appearance: none;
-              width: 30px;
-              height: 30px;
-              background-color: white;
-              border-radius: 50%;
-              cursor: pointer;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-              transition: transform 0.3s;
-            }
-            .slider:active::-webkit-slider-thumb {
-              transform: scale(1.2);
-            }
-            .slider::-moz-range-thumb {
-              width: 30px;
-              height: 30px;
-              background-color: white;
-              border-radius: 50%;
-              cursor: pointer;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-              transition: transform 0.3s;
-            }
-            .slider:active::-moz-range-thumb {
-              transform: scale(1.2);
-            }
-            @media (min-width: 600px) { 
-              button {
-                width: auto; 
-              }
-            }
-          </style>
-          <script>
-            function sendCommand(command) {
-              fetch('/' + command)
+          }  
+      </style>
+      <script>
+          function sendCommand(command) {
+            fetch('/' + command)
               .then(response => response.text())
               .then(data => console.log(data))
-              .catch(error => console.error('Error:', error));
-            }
-            function handleTouchStart(event, command) {
-              event.target.classList.add('active'); // 按下时添加放大效果
-              sendCommand(command);
-            }
+              .catch(error => console.error('Error:', error)
+            );
+          }
+          function handleTouchStart(event, command) {
+            event.target.classList.add('active'); // 按下时添加放大效果
+            sendCommand(command);
+          }
 
-            function handleTouchEnd(event) {
-              event.target.classList.remove('active'); // 松开后移除放大效果
-              sendCommand('stop');
-            }
-            function updateSpeed(value) {
-              fetch('/setSpeed?speed=' + value)
-                .then(response => response.text())
-                .then(data => console.log(data))
-                .catch(error => console.error('Error:', error));
-            }
-
-            
-          </script>
-        </head> 
-        <body>
+          function handleTouchEnd(event) {
+            event.target.classList.remove('active'); // 松开后移除放大效果
+            sendCommand('stop');
+          }
+          function updateSpeed(value) {
+            fetch('/setSpeed?speed=' + value)
+              .then(response => response.text())
+              .then(data => console.log(data))
+              .catch(error => console.error('Error:', error)
+            );
+          }
+      </script>
+    </head> 
+      <body>
           <h1>Jerry Motor Control</h1>
           <div class="button-container">
             <button 
@@ -168,19 +167,132 @@ String generateHTML = R"(
             </button>
           </div>
 
-          <div class="button-container">
-            <button 
-              ontouchstart="handleTouchStart(event,'stop');" 
-              <!--ontouchend="handleTouchEnd(event);">停止(Stop)-->
-            </button>
-          </div>
-          <div class="slider-container">
-            <label class="slider-label" for="speedSlider">速度(Speed)</label>
-            <input type="range" min="0" max="100" value="50" class="slider" id="speedSlider" oninput="updateSpeed(this.value);" </input>
-          </div>
-        </body>
-      </html>
-    )";
+      <div class="button-container">
+        <button 
+          ontouchstart="handleTouchStart(event,'stop');" 
+          <!--ontouchend="handleTouchEnd(event);">停止(Stop)-->
+        </button>
+      </div>
+      <div class="slider-container">
+        <label class="slider-label" for="speedSlider">速度(Speed)</label>
+        <input type="range" min="0" max="100" value="50" class="slider" id="speedSlider" oninput="updateSpeed(this.value);" </input>
+      </div>
+    </body>
+  </html>
+)";
+
+// 初始化串口
+void initBasic()
+{
+  Serial.begin(115200);
+  WiFi.hostname("Jerry-Smart-ESP8266"); // 设置ESP8266设备名
+  Serial.println("Program started");
+}
+
+// 初始化AP模式
+void initSoftAP()
+{
+  WiFi.mode(WIFI_AP);
+  // 设置固定IP地址
+  if (!WiFi.softAPConfig(local_IP, gateway, subnet))
+  {
+    Serial.println("Failed to configure AP");
+  }
+
+  // 启动AP模式
+  WiFi.softAP(ssid, password);
+  // WiFi.softAP(ssid);
+  Serial.println();
+  Serial.print("Access Point \"");
+  Serial.print(ssid);
+  Serial.println("\" started");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.softAPIP());
+}
+
+// 初始化WebServer
+void initWebServer()
+{
+  // 设置首页网页内容
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { 
+              Serial.println();
+              Serial.print("打开首页: ");
+              //request->send(200, "text/html", generateHTML); 
+              AsyncWebServerResponse *response = request->beginResponse(200, "text/html; charset=utf-8", generate_html);
+              request->send(response); });
+
+  // 捕获所有未处理请求
+  server.onNotFound([](AsyncWebServerRequest *request)
+                    {
+    // 只重定向非电机控制请求到根目录
+    if (!request->url().startsWith("/forward") &&
+        !request->url().startsWith("/backward") &&
+        !request->url().startsWith("/left") &&
+        !request->url().startsWith("/right") &&
+        !request->url().startsWith("/stop")&&
+        !request->url().startsWith("/setSpeed")) {
+            Serial.println();
+            Serial.print("非内部请求，强制跳转门户: ");
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/html; charset=utf-8", generate_html);
+              request->send(response);  //非内部请求，强制跳转门户
+    } else {
+      // 对于电机控制请求，返回 404 或适当响应
+      //request->send(404, "text/plain", "Not Found");
+    } });
+
+  // 创建Web接口来控制电机
+  // 前进请求接口
+  server.on("/forward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    isObstacleDetectionEnabled = true;
+    moveForward(speed);
+    request->send(200, "text/plain", "前进(Moving Forward)"); });
+  // 后退请求接口
+  server.on("/backward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    isObstacleDetectionEnabled = false;
+    moveBackward(speed);
+    request->send(200, "text/plain", "后退(Moving Backward)"); });
+  // 左转请求接口
+  server.on("/left", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              isObstacleDetectionEnabled = true;
+    turnLeft(speed);
+    request->send(200, "text/plain", "左转(Turning Left)"); });
+  // 右转请求接口
+  server.on("/right", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              isObstacleDetectionEnabled = true;
+    turnRight(speed);
+    request->send(200, "text/plain", "右转(Turning Right)"); });
+  // 停止请求接口
+  server.on("/stop", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    isObstacleDetectionEnabled = false; 
+    stopMotor();
+    request->send(200, "text/plain", "停止(Stopping)"); });
+
+  // 处理电机调速请求
+  server.on("/setSpeed", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    if (request->hasParam("speed")) {
+      motorSpeed = request->getParam("speed")->value().toInt();
+      speed = 1023 * (motorSpeed/100.0);
+      Serial.println();
+      Serial.print("调速请求: ");
+      Serial.print(motorSpeed);
+      Serial.print("-->>> ");
+      Serial.print(speed);
+      request->send(200, "text/plain", "Speed set to: " + String(motorSpeed));
+    } else {
+      request->send(400, "text/plain", "No speed parameter provided");
+    } });
+
+  // 启动Web服务器
+  server.begin();
+  Serial.println("WebServer started!");
+}
 
 // 初始化DNS服务器
 void initDNS()
@@ -272,114 +384,19 @@ void detectObstacleAndMove()
   lastRightSensorValue = rightSensorValue;
 }
 
+// 程序初始化
 void setup()
 {
-
-  Serial.begin(115200);
-  Serial.println("Program started");
-  // 初始化GDB调试
-  // gdbstub_init();
-
-  // 设置L298n驱动引脚
+  initBasic();
+  // gdbstub_init(); // 初始化GDB调试
   setupMotorPins();
-  // 初始化红外传感器引脚
   setupMSensorPins();
-  // 设置固定IP地址
-  if (!WiFi.softAPConfig(local_IP, gateway, subnet))
-  {
-    Serial.println("Failed to configure AP");
-  }
 
-  // 启动AP模式
-  WiFi.softAP(ssid, password);
-  // WiFi.softAP(ssid);
-  Serial.println();
-  Serial.print("Access Point \"");
-  Serial.print(ssid);
-  Serial.println("\" started");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP()); // 打印 ESP8266 AP模式下的 IP 地址
-  // dnsServer.start(DNS_PORT, "*", local_IP);
-  initDNS(); // 启动dnsServer
+  initSoftAP();
+  initDNS();
+  initWebServer();
 
-  // 设置网页内容
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { 
-              Serial.println();
-              Serial.print("打开首页: ");
-              //request->send(200, "text/html", generateHTML); 
-              AsyncWebServerResponse *response = request->beginResponse(200, "text/html; charset=utf-8", generateHTML);
-              request->send(response); });
-
-  // 捕获所有未处理请求
-  server.onNotFound([](AsyncWebServerRequest *request)
-                    {
-    // 只重定向非电机控制请求到根目录
-    if (!request->url().startsWith("/forward") &&
-        !request->url().startsWith("/backward") &&
-        !request->url().startsWith("/left") &&
-        !request->url().startsWith("/right") &&
-        !request->url().startsWith("/stop")&&
-        !request->url().startsWith("/setSpeed")) {
-            Serial.println();
-            Serial.print("非内部请求，强制跳转门户: ");
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/html; charset=utf-8", generateHTML);
-              request->send(response);  //非内部请求，强制跳转门户
-    } else {
-      // 对于电机控制请求，返回 404 或适当响应
-      //request->send(404, "text/plain", "Not Found");
-    } });
-
-  // 创建Web接口来控制电机
-  server.on("/forward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    isObstacleDetectionEnabled = true;
-    moveForward(speed);
-    request->send(200, "text/plain", "前进(Moving Forward)"); });
-
-  server.on("/backward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    isObstacleDetectionEnabled = false;
-    moveBackward(speed);
-    request->send(200, "text/plain", "后退(Moving Backward)"); });
-
-  server.on("/left", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-              isObstacleDetectionEnabled = true;
-    turnLeft(speed);
-    request->send(200, "text/plain", "左转(Turning Left)"); });
-
-  server.on("/right", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-              isObstacleDetectionEnabled = true;
-    turnRight(speed);
-    request->send(200, "text/plain", "右转(Turning Right)"); });
-
-  server.on("/stop", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    isObstacleDetectionEnabled = false; 
-    stopMotor();
-    request->send(200, "text/plain", "停止(Stopping)"); });
-
-  // 处理电机调速请求
-  server.on("/setSpeed", HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    if (request->hasParam("speed")) {
-      motorSpeed = request->getParam("speed")->value().toInt();
-      speed = 1023 * (motorSpeed/100.0);
-      Serial.println();
-      Serial.print("调速请求: ");
-      Serial.print(motorSpeed);
-      Serial.print("-->>> ");
-      Serial.print(speed);
-      request->send(200, "text/plain", "Speed set to: " + String(motorSpeed));
-    } else {
-      request->send(400, "text/plain", "No speed parameter provided");
-    } });
-
-  // 启动Web服务器
-  server.begin();
-  Serial.println("Web服务器已启动");
+  // 测式电机
   moveForward();
   delay(100);
   moveBackward();
@@ -391,6 +408,7 @@ void setup()
   stopMotor();
 }
 
+// 执行无限循环任务
 void loop()
 {
   // 处理DNS请求

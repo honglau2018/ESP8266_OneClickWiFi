@@ -8,7 +8,7 @@
 #define IN3 D3 // ESP8266 D3 (GPIO 0) 连接到 L298N IN3
 #define IN4 D4 // ESP8266 D4 (GPIO 2) 连接到 L298N IN4
 
-// 定义红外避障传感器引脚
+// 定义红外避障传感器引脚 SENSOR  ir_sensor
 #define LEFT_SENSOR_PIN D5  // 左侧红外传感器
 #define RIGHT_SENSOR_PIN D6 // 右侧红外传感器
 
