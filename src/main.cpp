@@ -17,13 +17,15 @@ const byte DNS_PORT = 53; // DNS端口号
 DNSServer dnsServer;      // 创建dnsServer实例  开启强制门户
 
 int motorSpeed = 50; //   默认速度  50%
-int speed = 1023 * (50 / 100.0);
+int normalSpeed = 1023 * (50 / 100.0); // 正常前进速度
+int turnSpeed = normalSpeed/2;     // 转向速度，设置为正常速度的一半
+
 
 bool isObstacleDetectionEnabled = false; // 障碍检测状态标识
 int lastLeftSensorValue = HIGH;          // 用于保存上次的传感器状态
 int lastRightSensorValue = HIGH;
 
-// #pragma region  generate_html 控制网页内容
+#pragma region  generate_html 控制网页内容
 String generate_html = R"(
   <html>
     <head>
@@ -180,18 +182,18 @@ String generate_html = R"(
     </body>
   </html>
 )";
-// #pragma endregion
+#pragma endregion
 
-#pragma region initBasic 初始化串口
+//#pragma region initBasic 初始化串口
 void initBasic()
 {
   Serial.begin(115200);
   WiFi.hostname("Jerry-Smart-ESP8266"); // 设置ESP8266设备名
   Serial.println("Program started");
 }
-#pragma endregion initBasic 初始化串口
+//#pragma endregion initBasic 初始化串口
 
-#pragma region initSoftAP 初始化AP模式
+//#pragma region initSoftAP 初始化AP模式
 void initSoftAP()
 {
   WiFi.mode(WIFI_AP);
@@ -210,7 +212,7 @@ void initSoftAP()
   Serial.print("IP Address: ");
   Serial.println(WiFi.softAPIP());
 }
-#pragma endregion initSoftAP 初始化AP模式
+//#pragma endregion initSoftAP 初始化AP模式
 
 // 初始化WebServer
 void initWebServer()
@@ -248,25 +250,25 @@ void initWebServer()
   server.on("/forward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
     isObstacleDetectionEnabled = true;
-    moveForward(speed);
+    moveForward(normalSpeed);
     request->send(200, "text/plain", "前进(Moving Forward)"); });
   // 后退请求接口
   server.on("/backward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
     isObstacleDetectionEnabled = false;
-    moveBackward(speed);
+    moveBackward(normalSpeed);
     request->send(200, "text/plain", "后退(Moving Backward)"); });
   // 左转请求接口
   server.on("/left", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
               isObstacleDetectionEnabled = true;
-              turnLeft(speed);
+              turnLeft(turnSpeed);
               request->send(200, "text/plain", "左转(Turning Left)"); });
   // 右转请求接口
   server.on("/right", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
               isObstacleDetectionEnabled = true;
-    turnRight(speed);
+    turnRight(turnSpeed);
     request->send(200, "text/plain", "右转(Turning Right)"); });
   // 停止请求接口
   server.on("/stop", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
@@ -280,12 +282,13 @@ void initWebServer()
             {
     if (request->hasParam("speed")) {
       motorSpeed = request->getParam("speed")->value().toInt();
-      speed = 1023 * (motorSpeed/100.0);
+      normalSpeed = 1023 * (motorSpeed/100.0);
+      turnSpeed = normalSpeed/2;
       Serial.println();
       Serial.print("调速请求: ");
       Serial.print(motorSpeed);
       Serial.print("-->>> ");
-      Serial.print(speed);
+      Serial.print(normalSpeed);
       request->send(200, "text/plain", "Speed set to: " + String(motorSpeed));
     } else {
       request->send(400, "text/plain", "No speed parameter provided");
