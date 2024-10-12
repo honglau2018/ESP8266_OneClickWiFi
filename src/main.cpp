@@ -1,11 +1,11 @@
 #include <ESP8266WiFi.h>
 #include <WiFiManager.h>
 #include "ESPAsyncWebServer.h"
-#include <GDBStub.h>
+// #include <GDBStub.h>
 #include "motor_control.h"
 
 // 设置AP模式的SSID和密码
-const char *ssid = "Jerry_智能小车_AP2"; // ESP8266热点名称
+const char *ssid = "Jerry_智能小车_AP"; // ESP8266热点名称
 const char *password = "12345678";       // 密码
 
 // 固定的IP地址配置
@@ -16,16 +16,15 @@ IPAddress subnet(255, 255, 255, 0);  // 子网掩码
 const byte DNS_PORT = 53; // DNS端口号
 DNSServer dnsServer;      // 创建dnsServer实例  开启强制门户
 
-int motorSpeed = 50; //   默认速度  50%
+int motorSpeed = 50;                   //   默认速度  50%
 int normalSpeed = 1023 * (50 / 100.0); // 正常前进速度
-int turnSpeed = normalSpeed/2;     // 转向速度，设置为正常速度的一半
-
+int turnSpeed = normalSpeed / 2;       // 转向速度，设置为正常速度的一半
 
 bool isObstacleDetectionEnabled = false; // 障碍检测状态标识
 int lastLeftSensorValue = HIGH;          // 用于保存上次的传感器状态
 int lastRightSensorValue = HIGH;
 
-#pragma region  generate_html 控制网页内容
+#pragma region generate_html 控制网页内容
 String generate_html = R"(
   <html>
     <head>
@@ -184,16 +183,16 @@ String generate_html = R"(
 )";
 #pragma endregion
 
-//#pragma region initBasic 初始化串口
+// #pragma region initBasic 初始化串口
 void initBasic()
 {
   Serial.begin(115200);
   WiFi.hostname("Jerry-Smart-ESP8266"); // 设置ESP8266设备名
   Serial.println("Program started");
 }
-//#pragma endregion initBasic 初始化串口
+// #pragma endregion initBasic 初始化串口
 
-//#pragma region initSoftAP 初始化AP模式
+// #pragma region initSoftAP 初始化AP模式
 void initSoftAP()
 {
   WiFi.mode(WIFI_AP);
@@ -212,7 +211,7 @@ void initSoftAP()
   Serial.print("IP Address: ");
   Serial.println(WiFi.softAPIP());
 }
-//#pragma endregion initSoftAP 初始化AP模式
+// #pragma endregion initSoftAP 初始化AP模式
 
 // 初始化WebServer
 void initWebServer()
@@ -363,7 +362,7 @@ void detectObstacleAndMove()
     if (lastLeftSensorValue != LOW)
     {
       // 如果左传感器检测到障碍物，右转
-      turnRight();
+      turnRight(turnSpeed);
       Serial.println("左侧有障碍物，右转");
     }
     else
@@ -376,7 +375,7 @@ void detectObstacleAndMove()
     if (lastRightSensorValue != LOW)
     {
       // 如果右传感器检测到障碍物，左转
-      turnLeft();
+      turnLeft(turnSpeed);
       Serial.println("右侧有障碍物，左转");
     }
     else
@@ -389,7 +388,7 @@ void detectObstacleAndMove()
     if (lastLeftSensorValue != HIGH || lastRightSensorValue != HIGH)
     {
       // 没有障碍物，继续前进
-      moveForward();
+      moveForward(normalSpeed);
       Serial.println("last前进中，无障碍");
     }
     else
