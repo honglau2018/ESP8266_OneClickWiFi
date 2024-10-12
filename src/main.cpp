@@ -5,12 +5,12 @@
 #include "motor_control.h"
 
 // 设置AP模式的SSID和密码
-const char *ssid = "Jerry_智能小车_AP2"; // 自定义ESP8266热点的名称
-const char *password = "12345678";       // 热点的密码
+const char *ssid = "Jerry_智能小车_AP2"; // ESP8266热点名称
+const char *password = "12345678";       // 密码
 
 // 固定的IP地址配置
-IPAddress local_IP(192, 168, 10, 1); // 你想要设置的固定IP地址
-IPAddress gateway(192, 168, 10, 1);  // 默认网关（可以设置为与ESP的IP相同）
+IPAddress local_IP(192, 168, 10, 1); // IP地址
+IPAddress gateway(192, 168, 10, 1);  // 默认网关
 IPAddress subnet(255, 255, 255, 0);  // 子网掩码
 
 const byte DNS_PORT = 53; // DNS端口号
@@ -258,8 +258,8 @@ void initWebServer()
   server.on("/left", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
               isObstacleDetectionEnabled = true;
-    turnLeft(speed);
-    request->send(200, "text/plain", "左转(Turning Left)"); });
+              turnLeft(speed);
+              request->send(200, "text/plain", "左转(Turning Left)"); });
   // 右转请求接口
   server.on("/right", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -306,6 +306,20 @@ void initDNS()
   {
     Serial.println("start dnsserver failed.");
   }
+}
+
+// 测式电机
+void testMotor()
+{
+  moveForward();
+  delay(100);
+  moveBackward();
+  delay(100);
+  turnLeft();
+  delay(100);
+  turnRight();
+  delay(100);
+  stopMotor();
 }
 
 // 障碍物检测和电机控制逻辑
@@ -387,8 +401,9 @@ void detectObstacleAndMove()
 // 程序初始化
 void setup()
 {
-  initBasic();
   // gdbstub_init(); // 初始化GDB调试
+  initBasic();
+
   setupMotorPins();
   setupMSensorPins();
 
@@ -396,16 +411,7 @@ void setup()
   initDNS();
   initWebServer();
 
-  // 测式电机
-  moveForward();
-  delay(100);
-  moveBackward();
-  delay(100);
-  turnLeft();
-  delay(100);
-  turnRight();
-  delay(100);
-  stopMotor();
+  testMotor();
 }
 
 // 执行无限循环任务
