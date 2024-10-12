@@ -51,11 +51,10 @@ void moveForward()
 
 void moveForward(int speed)
 {
-  // speed 0（停止）到 1023（全速）
-  analogWrite(IN1, speed); // 调整电机A的转速   施加 PWM 信号
-  digitalWrite(IN2, LOW);  // 电机A方向
-  analogWrite(IN3, speed); // 调整电机B的转速
-  digitalWrite(IN4, LOW);  // 电机B方向
+  digitalWrite(IN1, LOW);
+  analogWrite(IN2, speed);
+  analogWrite(IN3, speed);
+  digitalWrite(IN4, LOW);
 
   Serial.println();
   Serial.print("moveForward: ");
@@ -74,10 +73,11 @@ void moveBackward()
 }
 void moveBackward(int speed)
 {
-  digitalWrite(IN1, LOW);  // 电机A方向
-  analogWrite(IN2, speed); // 调整电机A的转速
-  digitalWrite(IN3, LOW);  // 电机B方向
-  analogWrite(IN4, speed); // 调整电机B的转速
+  analogWrite(IN1, speed);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  analogWrite(IN4, speed);
+
   Serial.println();
   Serial.print("moveBackward: ");
   Serial.print(speed);
@@ -90,15 +90,16 @@ void turnLeft()
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
-    Serial.println();
+  Serial.println();
   Serial.print("moveBackward ");
 }
 void turnLeft(int speed)
 {
-  digitalWrite(IN1, LOW);
-  analogWrite(IN2, speed);
-  analogWrite(IN3, speed);
-  digitalWrite(IN4, LOW);
+  analogWrite(IN1, speed); // 调整电机A的转速   施加 PWM 信号
+  digitalWrite(IN2, LOW);  // 电机A方向
+  analogWrite(IN3, speed); // 调整电机B的转速
+  digitalWrite(IN4, LOW);  // 电机B方向
+
   Serial.println();
   Serial.print("turnLeft: ");
   Serial.print(speed);
@@ -111,15 +112,17 @@ void turnRight()
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
-    Serial.println();
+  Serial.println();
   Serial.print("turnRight");
 }
 void turnRight(int speed)
 {
-  analogWrite(IN1, speed);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  analogWrite(IN4, speed);
+
+  digitalWrite(IN1, LOW);  // 电机A方向
+  analogWrite(IN2, speed); // 调整电机A的转速
+  digitalWrite(IN3, LOW);  // 电机B方向
+  analogWrite(IN4, speed); // 调整电机B的转速
+
   Serial.println();
   Serial.print("turnRight: ");
   Serial.print(speed);

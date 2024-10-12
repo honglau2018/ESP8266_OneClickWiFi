@@ -23,7 +23,7 @@ bool isObstacleDetectionEnabled = false; // 障碍检测状态标识
 int lastLeftSensorValue = HIGH;          // 用于保存上次的传感器状态
 int lastRightSensorValue = HIGH;
 
-// generate_html 控制网页内容
+// #pragma region  generate_html 控制网页内容
 String generate_html = R"(
   <html>
     <head>
@@ -170,7 +170,7 @@ String generate_html = R"(
       <div class="button-container">
         <button 
           ontouchstart="handleTouchStart(event,'stop');" 
-          <!--ontouchend="handleTouchEnd(event);">停止(Stop)-->
+          ontouchend="handleTouchEnd(event);">停止(Stop)
         </button>
       </div>
       <div class="slider-container">
@@ -180,16 +180,18 @@ String generate_html = R"(
     </body>
   </html>
 )";
+// #pragma endregion
 
-// 初始化串口
+#pragma region initBasic 初始化串口
 void initBasic()
 {
   Serial.begin(115200);
   WiFi.hostname("Jerry-Smart-ESP8266"); // 设置ESP8266设备名
   Serial.println("Program started");
 }
+#pragma endregion initBasic 初始化串口
 
-// 初始化AP模式
+#pragma region initSoftAP 初始化AP模式
 void initSoftAP()
 {
   WiFi.mode(WIFI_AP);
@@ -200,8 +202,7 @@ void initSoftAP()
   }
 
   // 启动AP模式
-  WiFi.softAP(ssid, password);
-  // WiFi.softAP(ssid);
+  WiFi.softAP(ssid, password); // WiFi.softAP(ssid);
   Serial.println();
   Serial.print("Access Point \"");
   Serial.print(ssid);
@@ -209,6 +210,7 @@ void initSoftAP()
   Serial.print("IP Address: ");
   Serial.println(WiFi.softAPIP());
 }
+#pragma endregion initSoftAP 初始化AP模式
 
 // 初始化WebServer
 void initWebServer()
