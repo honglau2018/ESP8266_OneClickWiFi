@@ -19,8 +19,8 @@ DNSServer dnsServer;      // 创建dnsServer实例  开启强制门户
 int motorSpeed = 50; //   默认速度  50%
 int speed = 1023 * (50 / 100.0);
 
-bool isMovingForward = false;   // 是否正在前进的状态标识
-int lastLeftSensorValue = HIGH; // 用于保存上次的传感器状态
+bool isObstacleDetectionEnabled = false; // 障碍检测状态标识
+int lastLeftSensorValue = HIGH;          // 用于保存上次的传感器状态
 int lastRightSensorValue = HIGH;
 
 // generateHTML控制网页内容
@@ -333,28 +333,31 @@ void setup()
   // 创建Web接口来控制电机
   server.on("/forward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
-    isMovingForward = true;
+    isObstacleDetectionEnabled = true;
     moveForward(speed);
     request->send(200, "text/plain", "前进(Moving Forward)"); });
 
   server.on("/backward", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
+    isObstacleDetectionEnabled = false;
     moveBackward(speed);
     request->send(200, "text/plain", "后退(Moving Backward)"); });
 
   server.on("/left", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
+              isObstacleDetectionEnabled = true;
     turnLeft(speed);
     request->send(200, "text/plain", "左转(Turning Left)"); });
 
   server.on("/right", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
+              isObstacleDetectionEnabled = true;
     turnRight(speed);
     request->send(200, "text/plain", "右转(Turning Right)"); });
 
   server.on("/stop", AsyncWeb_HTTP_GET, [](AsyncWebServerRequest *request)
             {
-    isMovingForward = false; 
+    isObstacleDetectionEnabled = false; 
     stopMotor();
     request->send(200, "text/plain", "停止(Stopping)"); });
 
@@ -393,11 +396,11 @@ void loop()
   // 处理DNS请求
   dnsServer.processNextRequest();
 
-  if (isMovingForward)
+  if (isObstacleDetectionEnabled)
   {
     Serial.println();
     Serial.print("启动红外障碍: ");
-    Serial.print(isMovingForward);
+    Serial.print(isObstacleDetectionEnabled);
     detectObstacleAndMove();
     delay(100); // 延时，避免频繁检测
   }
